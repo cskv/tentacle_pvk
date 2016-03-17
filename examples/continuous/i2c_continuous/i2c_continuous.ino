@@ -41,13 +41,13 @@ byte sensor_bytes_received = 0;       // We need to know how many characters byt
 byte code = 0;                        // used to hold the I2C response code.
 byte in_char = 0;                     // used as a 1 byte buffer to store in bound bytes from the I2C Circuit.
 
-#define TOTAL_CIRCUITS 4              // <-- CHANGE THIS | set how many I2C circuits are attached to the Tentacle shield(s): 1-8
+#define TOTAL_CIRCUITS 2              // <-- CHANGE THIS | set how many I2C circuits are attached to the Tentacle shield(s): 1-8
 
-int channel_ids[] = {97, 98, 99, 100};// <-- CHANGE THIS.
+int channel_ids[] = {99, 101};// <-- CHANGE THIS.
 // A list of I2C ids that you set your circuits to.
 // This array should have 1-8 elements (1-8 circuits connected)
 
-char *channel_names[] = {"DO", "ORP", "PH", "EC"}; // <-- CHANGE THIS.
+char *channel_names[] = {"PH1", "PH2"}; // <-- CHANGE THIS.
 // A list of channel names (must be the same order as in channel_ids[]) 
 // it's used to give a name to each sensor ID. This array should have 1-8 elements (1-8 circuits connected).
 // {"PH Tank 1", "PH Tank 2", "EC Tank 1", "EC Tank2"}, or {"PH"}

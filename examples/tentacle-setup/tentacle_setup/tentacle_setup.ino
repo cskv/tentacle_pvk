@@ -49,7 +49,10 @@ char sensordata[30];                     //A 30 byte character array to hold inc
 byte computer_bytes_received = 0;        //We need to know how many characters bytes have been received
 byte sensor_bytes_received = 0;          //We need to know how many characters bytes have been received
 int channel;                             //INT pointer for channel switching - 0-7 serial, 8-127 I2C addresses
+
 char *cmd;                               //Char pointer used in string parsing
+//const char *cmd;                               //Char pointer used in string parsing
+
 int retries;                             // com-check functions store number of retries here
 boolean answerReceived;                  // com-functions store here if a connection-attempt was successful
 byte error;                              // error-byte to store result of Wire.transmissionEnd()
