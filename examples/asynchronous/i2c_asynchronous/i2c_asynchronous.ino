@@ -52,7 +52,7 @@ byte sensor_bytes_received = 0;               // We need to know how many charac
 byte code = 0;                                // used to hold the I2C response code.
 byte in_char = 0;                             // used as a 1 byte buffer to store in bound bytes from the I2C Circuit.
 
-int channel_ids[] = {99, 101};        // <-- CHANGE THIS. A list of I2C ids that you set your circuits to.
+int channel_ids[] = {99, 101};            // <-- CHANGE THIS. A list of I2C ids that you set your circuits to.
 char *channel_names[] = {"pH1", "pH2"};   // <-- CHANGE THIS. A list of channel names (must be the same order as in channel_ids[]) - only used to designate the readings in serial communications
 String readings[TOTAL_CIRCUITS];               // an array of strings to hold the readings of each channel
 int channel = 0;                              // INT pointer to hold the current position in the channel_ids/channel_names array
