@@ -25,6 +25,20 @@
 // 99:R<CR>
 // 110:CAL,mid,7.00<CR>
 //
+// Possible commands:
+
+// Command     Function                                  Manual page
+// L           Enable / Disable or Query the LEDs        (pg.46)
+// R           Returns a single reading                  (pg.47)
+// T           Set or Query the temperature compensation (pg.48)
+// CAL         Performs calibration                      (pg.49)
+// SLOPE       Queries slope                             (pg.55)
+// I           Device information                        (pg.56)
+// STATUS      Retrieve status information                pg.57)
+// I2C         I2C address change                        (pg.58)
+// SLEEP       Enter low power sleep mode                (pg.59)
+
+//
 //---------------------------------------------------------------------------------------------
 //
 // This program is free software: you can redistribute it and/or modify
@@ -139,5 +153,5 @@ void I2C_call() {  			                        // function to parse and call I2C 
         break;                         	
     }
   }
-  Serial.println(sensordata);	                 // print the data which inludes a <CR> \r at the end
+  Serial.println(sensordata);	                 // print the data which inludes a <CRLF> \r\n at the end
 }
