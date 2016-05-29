@@ -35,6 +35,8 @@
 
 #include <Wire.h>                     // enable I2C.
 
+unsigned long serial_host  = 9600;    // set baud rate for host serial monitor(pc/mac/other)
+
 char sensordata[30];                  // A 30 byte character array to hold incoming data from the sensors
 byte sensor_bytes_received = 0;       // We need to know how many characters bytes have been received
 
@@ -47,70 +49,63 @@ int channel_ids[] = {99, 101};// <-- CHANGE THIS.
 // A list of I2C ids that you set your circuits to.
 // This array should have 1-8 elements (1-8 circuits connected)
 
-char *channel_names[] = {"PH1", "PH2"}; // <-- CHANGE THIS.
+char *channel_names[] = {"pH1", "pH2"}; // <-- CHANGE THIS.
 // A list of channel names (must be the same order as in channel_ids[]) 
 // it's used to give a name to each sensor ID. This array should have 1-8 elements (1-8 circuits connected).
 // {"PH Tank 1", "PH Tank 2", "EC Tank 1", "EC Tank2"}, or {"PH"}
 
 
-
-void setup() {                      // startup function
-  Serial.begin(9600);	            // Set the hardware serial port.
-  Wire.begin();			    // enable I2C port.
+void setup() {                       // startup function
+  Serial.begin(serial_host);	       // Set the hardware serial port.
+  Wire.begin();			                 // enable I2C port.
 }
-
 
 
 void loop() {
 
-  for (int channel = 0; channel < TOTAL_CIRCUITS; channel++) {       // loop through all the sensors
+  for (int channel = 0; channel < TOTAL_CIRCUITS; channel++) {  // loop through all the sensors
   
-    Wire.beginTransmission(channel_ids[channel]);     // call the circuit by its ID number.
-    Wire.write('r');        		              // request a reading by sending 'r'
-    Wire.endTransmission();          	              // end the I2C data transmission.
+    Wire.beginTransmission(channel_ids[channel]);               // call the circuit by its ID number.
+    Wire.write('R');        		                                // request a reading by sending 'R' (capital R as in manual)
+    Wire.endTransmission();          	                          // end the I2C data transmission.
     
-    delay(1000);  // AS circuits need a 1 second before the reading is ready
+    delay(1000);                                                // AS circuits need a 1 second before the reading is ready
 
-    sensor_bytes_received = 0;                        // reset data counter
-    memset(sensordata, 0, sizeof(sensordata));        // clear sensordata array;
+    sensor_bytes_received = 0;                                  // reset data counter
+    memset(sensordata, 0, sizeof(sensordata));                  // clear sensordata array;
 
-    Wire.requestFrom(channel_ids[channel], 48, 1);    // call the circuit and request 48 bytes (this is more then we need).
+    Wire.requestFrom(channel_ids[channel], 48, 1);              // call the circuit and request 48 bytes (this is more then we need).
     code = Wire.read();
 
-    while (Wire.available()) {          // are there bytes to receive?
-      in_char = Wire.read();            // receive a byte.
+    while (Wire.available()) {                                  // are there bytes to receive?
+      in_char = Wire.read();                                    // receive a byte.
 
-      if (in_char == 0) {               // null character indicates end of command
-        Wire.endTransmission();         // end the I2C data transmission.
-        break;                          // exit the while loop, we're done here
+      if (in_char == 0) {                                       // null character indicates end of command
+        Wire.endTransmission();                                 // end the I2C data transmission.
+        break;                                                  // exit the while loop, we're done here
       }
       else {
-        sensordata[sensor_bytes_received] = in_char;      // append this byte to the sensor data array.
+        sensordata[sensor_bytes_received] = in_char;           // append this byte to the sensor data array.
         sensor_bytes_received++;
       }
     }
     
-    Serial.print(channel_names[channel]);   // print channel name
+    Serial.print(channel_names[channel]);                      // print channel name
     Serial.print(':');
 
-    switch (code) {                  	    // switch case based on what the response code is.
-      case 1:                       	    // decimal 1  means the command was successful.
-        Serial.println(sensordata);       // print the actual reading
-        break;                        	    // exits the switch case.
-
-      case 2:                        	    // decimal 2 means the command has failed.
-        Serial.println("command failed");   // print the error
-        break;                         	    // exits the switch case.
-
-      case 254:                      	    // decimal 254  means the command has not yet been finished calculating.
-        Serial.println("circuit not ready"); // print the error
-        break;                         	    // exits the switch case.
-
-      case 255:                      	    // decimal 255 means there is no further data to send.
-        Serial.println("no data");          // print the error
-        break;                         	    // exits the switch case.
+    switch (code) {                  	             // switch case based on what the response code is.
+      case 1:                       	             // decimal 1  means the command was successful.
+        Serial.println(sensordata);                // print the actual reading
+        break;                        	           
+      case 2:                        	             // decimal 2 means the command has failed.
+        Serial.println("< Command failed");        // print the error
+        break;                         	           
+      case 254:                      	             // decimal 254  means the command has not yet been finished calculating.
+        Serial.println("< Command pending");       // print the error
+        break;                         	    
+      case 255:                      	             // decimal 255 means there is no further data to send.
+        Serial.println("< No data");               // print the error
+        break;                         	    
     }
-
-  } // for loop 
-
+  }                                                // for loop 
 }

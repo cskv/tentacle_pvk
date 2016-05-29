@@ -36,20 +36,19 @@
 //
 //---------------------------------------------------------------------------------------------
 
-#include <Wire.h>                	        //enable I2C.
+#include <Wire.h>                	       //enable I2C.
 
-
-#ifdef ARDUINO_SAM_DUE  // Arduino Due  
-#define WIRE Wire1  
+#ifdef ARDUINO_SAM_DUE                   // Arduino Due  
+  #define WIRE Wire1  
 #else 
-#define WIRE Wire  
+  #define WIRE Wire  
 #endif 
 
-char sensordata[30];                     //A 30 byte character array to hold incoming data from the sensors
-byte computer_bytes_received = 0;        //We need to know how many characters bytes have been received
-byte sensor_bytes_received = 0;          //We need to know how many characters bytes have been received
-int channel;                             //INT pointer for channel switching - 0-7 serial, 8-127 I2C addresses
-char *cmd;                               //Char pointer used in string parsing
+char sensordata[30];                     // A 30 byte character array to hold incoming data from the sensors
+byte computer_bytes_received = 0;        // We need to know how many characters bytes have been received
+byte sensor_bytes_received = 0;          // We need to know how many characters bytes have been received
+int channel;                             // INT pointer for channel switching - 0-7 serial, 8-127 I2C addresses
+char *cmd;                               // Char pointer used in string parsing
 int retries;                             // com-check functions store number of retries here
 boolean answerReceived;                  // com-functions store here if a connection-attempt was successful
 byte error;                              // error-byte to store result of Wire.transmissionEnd()
@@ -57,33 +56,29 @@ byte error;                              // error-byte to store result of Wire.t
 String stamp_type;                       // hold the name / type of the stamp
 char stamp_version[4];                   // hold the version of the stamp
 
-char computerdata[20];           	       //we make a 20 byte character array to hold incoming data from a pc/mac/other.
+char computerdata[20];           	       // we make a 20 byte character array to hold incoming data from a pc/mac/other.
 
 byte i2c_response_code = 0;              //used to hold the I2C response code.
-byte in_char = 0;                  	     //used as a 1 byte buffer to store in bound bytes from an I2C stamp.
-
+byte in_char = 0;                  	     //used as a 1 byte buffer to store inbound bytes from an I2C stamp.
 
 
 void setup() {
-
   Serial.begin(9600);                    // Set the hardware serial port to 38400
   while (!Serial) ;                      // Leonardo-type arduinos need this to be able to write to the serial port in setup()
   WIRE.begin();                 	       // enable I2C port.
-
   stamp_type.reserve(16);                // reserve string buffer to save some SRAM
-  intro();				 // display startup message
+  intro();				                       // display startup message
 }
-
 
 
 void loop() {
   //Serial.println(".");
-  if (computer_bytes_received != 0) {            //If input recieved from PC/MAC/other
-    cmd = computerdata;                          //Set cmd with incoming serial data
+  if (computer_bytes_received != 0) {            // If input recieved from PC/MAC/other
+    cmd = computerdata;                          // Set cmd with incoming serial data
 
-    if (String(cmd) == "help") {		 //if help entered...
-      help(); 					 //call help dialogue
-      computer_bytes_received = 0;               //Reset the var computer_bytes_received to equal 0
+    if (String(cmd) == "help") {		             // if help entered...
+      help(); 					                         // call help dialogue
+      computer_bytes_received = 0;               // Reset the var computer_bytes_received to equal 0
       return;
     }
     else if (String(cmd) == "scan") {         // if scan requested
@@ -97,15 +92,14 @@ void loop() {
       return;
     }
     else {
-
       // TODO: without loop?
-      for (int x = 0; x <= 127; x++) {		//loop through input searching for a channel change request (integer between 0 and 127)
+      for (int x = 0; x <= 127; x++) {		       // loop through input searching for a channel change request (integer between 0 and 127)
         if (String(cmd) == String(x)) {
           Serial.print("changing channel to ");
           Serial.println( cmd);
-          channel = atoi(cmd);			//set channel variable to number 0-127
+          channel = atoi(cmd);			             // set channel variable to number 0-127
 
-          if (change_channel()) {		//set MUX switches or I2C address
+          if (change_channel()) {		             // set MUX switches or I2C address
 
             Serial.println(  "-------------------------------------");
             Serial.print(    "ACTIVE channel : ");
@@ -158,7 +152,6 @@ void loop() {
 }
 
 
-
 boolean change_channel() {                                 //function controls which I2C port is opened. returns true if channel could be changed.
 
   stamp_type = "";
@@ -176,14 +169,13 @@ boolean change_channel() {                                 //function controls w
 }
 
 
-
-byte I2C_call() {  					//function to parse and call I2C commands.
+byte I2C_call() {  					                            // function to parse and call I2C commands.
   sensor_bytes_received = 0;                            // reset data counter
   memset(sensordata, 0, sizeof(sensordata));            // clear sensordata array;
 
-  WIRE.beginTransmission(channel); 	                //call the circuit by its ID number.
-  WIRE.write(cmd);        			        //transmit the command that was sent through the serial port.
-  WIRE.endTransmission();          	                //end the I2C data transmission.
+  WIRE.beginTransmission(channel); 	                // call the circuit by its ID number.
+  WIRE.write(cmd);        			                    // transmit the command that was sent through the serial port.
+  WIRE.endTransmission();          	                // end the I2C data transmission.
 
   i2c_response_code = 254;
   while (i2c_response_code == 254) {      // in case the cammand takes longer to process, we keep looping here until we get a success or an error
@@ -197,15 +189,15 @@ byte I2C_call() {  					//function to parse and call I2C commands.
       delay(300);                         // all other commands: wait 300ms
     }
 
-    WIRE.requestFrom(channel, 32); 	  //call the circuit and request 48 bytes (this is more then we need).
-    i2c_response_code = WIRE.read();      //the first byte is the response code, we read this separately.
+    WIRE.requestFrom(channel, 32); 	      // call the circuit and request 48 bytes (this is more then we need).
+    i2c_response_code = WIRE.read();      // the first byte is the response code, we read this separately.
 
-    while (WIRE.available()) {            //are there bytes to receive.
-      in_char = WIRE.read();              //receive a byte.
+    while (WIRE.available()) {            // are there bytes to receive.
+      in_char = WIRE.read();              // receive a byte.
 
-      if (in_char == 0) {                 //if we see that we have been sent a null command.
+      if (in_char == 0) {                 // if we see that we have been sent a null command.
         while(WIRE.available()) { WIRE.read(); } // some arduinos (e.g. ZERO) put padding zeroes in the receiving buffer (up to the number of requested bytes)
-        break;                            //exit the while loop.
+        break;                            // exit the while loop.
       }
       else {
         sensordata[sensor_bytes_received] = in_char;        //load this byte into our array.
@@ -213,40 +205,32 @@ byte I2C_call() {  					//function to parse and call I2C commands.
       }
     }
 
-    switch (i2c_response_code) {         //switch case based on what the response code is.
-      case 1:                       	 //decimal 1.
-        Serial.println( "< success");     //means the command was successful.
-        break;                        	 //exits the switch case.
-
-      case 2:                        	 //decimal 2.
-        Serial.println( "< command failed");    	//means the command has failed.
-        break;                         	 //exits the switch case.
-
-      case 254:                      	 //decimal 254.
-        Serial.println( "< command pending");   	//means the command has not yet been finished calculating.
-        break;                         	 //exits the switch case.
-
-      case 255:                      	 //decimal 255.
-        Serial.println( "No Data");   	//means there is no further data to send.
-        break;                         	 //exits the switch case.
+    switch (i2c_response_code) {               // switch case based on what the response code is.
+      case 1:                       	         // decimal 1.
+        //Serial.println( "< Success");          // means the command was successful.
+        break;                        	
+      case 2:                        	         // decimal 2.
+        Serial.println( "< Command failed");   // means the command has failed.
+        break;                         	
+      case 254:                      	         // decimal 254.
+        Serial.println( "< Command pending");  // means the command has not yet been finished calculating.
+        break;                         	 
+      case 255:                      	         // decimal 255.
+        Serial.println( "< No Data");   	     // means there is no further data to send.
+        break;                         
     }
   }
 }
 
 
-
-boolean check_i2c_connection() {                      // check selected i2c channel/address. verify that it's working by requesting info about the stamp
-
+boolean check_i2c_connection() {               // check selected i2c channel/address. verify that it's working by requesting info about the stamp
   retries = 0;
-
   while (retries < 3) {
     retries++;
-    WIRE.beginTransmission(channel);      // just do a short connection attempt without command to scan i2c for devices
+    WIRE.beginTransmission(channel);           // just do a short connection attempt without command to scan i2c for devices
     error = WIRE.endTransmission();
 
-    if (error == 0)                       // if error is 0, there's a device
-    {
-
+    if (error == 0) {                          // if error is 0, there's a device
       int r_retries = 0;
       while (r_retries < 3) {
         r_retries++;
@@ -258,7 +242,6 @@ boolean check_i2c_connection() {                      // check selected i2c chan
           return true;
         }
       }
-
       return false;
     }
     else
