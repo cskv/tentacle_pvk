@@ -34,7 +34,7 @@
 // CAL         Performs calibration                      (pg.49)
 // SLOPE       Queries slope                             (pg.55)
 // I           Device information                        (pg.56)
-// STATUS      Retrieve status information                pg.57)
+// STATUS      Retrieve status information               (pg.57)
 // I2C         I2C address change                        (pg.58)
 // SLEEP       Enter low power sleep mode                (pg.59)
 
@@ -107,7 +107,12 @@ void I2C_call() {  			                        // function to parse and call I2C 
   sensor_bytes_received = 0;                    // reset data counter
   memset(sensordata, 0, sizeof(sensordata));    // clear sensordata array;
 
-  if (cmd[0] == 'C' || cmd[0] == 'R') time = 1400; else time = 300;                              
+  time = 5;                                     // minimal delay is 5 ms for read operations
+  
+  if      (cmd[0] == 'C'  && cmd[4] != '?') time = 1800;
+  else if (cmd[0] == 'R') time = 800;
+  else if (cmd[0] == 'L' && cmd[2] != '?') time = 300;
+                                 
   // if a command has been sent to CALibrate or take a Reading we wait 1400ms, 
   // so that the circuit has time to take the reading.
   // if any other command has been sent we wait only 300ms.
