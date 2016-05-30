@@ -102,7 +102,6 @@ void intro() {                                  // print intro
   Serial.println("READY_");
 }
 
-
 void I2C_call() {  			                        // function to parse and call I2C commands
   sensor_bytes_received = 0;                    // reset data counter
   memset(sensordata, 0, sizeof(sensordata));    // clear sensordata array;
@@ -113,7 +112,7 @@ void I2C_call() {  			                        // function to parse and call I2C 
   else if (cmd[0] == 'R') time = 800;
   else if (cmd[0] == 'L' && cmd[2] != '?') time = 300;
                                  
-  // if a command has been sent to CALibrate or take a Reading we wait 1400ms, 
+  // if a command has been sent to Calibrate or take a Reading we wait 1400ms, 
   // so that the circuit has time to take the reading.
   // if any other command has been sent we wait only 300ms.
   
@@ -141,7 +140,8 @@ void I2C_call() {  			                        // function to parse and call I2C 
         sensordata[sensor_bytes_received] = in_char;  // load this byte into our array.
         sensor_bytes_received++;
       }
-    }
+    }                                           // end while (Wire.available)
+    
     switch (code) {                  	          // switch case based on what the response code is.
       case 1:                       	          // decimal 1.
         //Serial.println("< Success");  	      // means the command was successful.  // Silence means everything is OK
@@ -156,7 +156,12 @@ void I2C_call() {  			                        // function to parse and call I2C 
       case 255:                      	          // decimal 255.
         Serial.println("< No data");   	        // means there is no further data to send.
         break;                         	
-    }
-  }
+    }                                          // end switch
+    
+  }                                            // end while (code == 254)
+  
+  //Serial.print(channel);                     // with two Atlas stamps we need to know from which device replies
+  //Serial.print(':');                         // same syntax as command with 'channel:reply'
   Serial.println(sensordata);	                 // print the data which inludes a <CRLF> \r\n at the end
-}
+}                                              // end I2CCall
+
