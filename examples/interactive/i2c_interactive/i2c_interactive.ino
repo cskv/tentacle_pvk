@@ -160,8 +160,8 @@ void I2C_call() {  			                        // function to parse and call I2C 
     
   }                                            // end while (code == 254)
   
-  //Serial.print(channel);                     // with two Atlas stamps we need to know from which device replies
-  //Serial.print(':');                         // same syntax as command with 'channel:reply'
+  Serial.print(channel);                     // with two Atlas stamps we need to know from which device replies
+  Serial.print(':');                         // same syntax as command with 'channel:reply'
   Serial.println(sensordata);	                 // print the data which inludes a <CRLF> \r\n at the end
 }                                              // end I2CCall
 
