@@ -60,13 +60,13 @@
 
 unsigned long serial_host  = 9600;  // set baud rate for host serial monitor(pc/mac/other)
 
-char sensordata[30];                // A 30 byte character array to hold incoming data from the sensors
+char sensordata[128];                // A 30 byte character array to hold incoming data from the sensors
 byte computer_bytes_received = 0;   // We need to know how many characters bytes have been received
 byte sensor_bytes_received = 0;     // We need to know how many characters bytes have been received
 int channel;                        // INT pointer for channel switching - 0-7 serial, 8-127 I2C addresses
 char *cmd;                          // Char pointer used in string parsing
 
-char computerdata[48];              // we make a 48 byte character array to hold incoming data from a pc/mac/other.
+char computerdata[128];              // we make a 48 byte character array to hold incoming data from a pc/mac/other.
 byte code = 0;                      // used to hold the I2C response code.
 byte in_char = 0;                   // used as a 1 byte buffer to store inbound bytes from the I2C Circuit.
 int time;                   	      // used to change the dynamic polling delay needed for I2C read operations.
@@ -79,7 +79,7 @@ void setup() {                      // startup function
 }
 
 void serialEvent() {               	// This interrupt will trigger when the data coming from the serial monitor(pc/mac/other) is received
-  computer_bytes_received = Serial.readBytesUntil(13, computerdata, 20); 	
+  computer_bytes_received = Serial.readBytesUntil(13, computerdata, 128); 	
   // We read the data sent from the serial monitor(pc/mac/other) until we see a <CR>. 
   // We also count how many characters have been received
   computerdata[computer_bytes_received] = 0; 				        
@@ -106,11 +106,11 @@ void I2C_call() {  			                        // function to parse and call I2C 
   sensor_bytes_received = 0;                    // reset data counter
   memset(sensordata, 0, sizeof(sensordata));    // clear sensordata array;
 
-  time = 5;                                     // minimal delay is 5 ms for read operations
+  time = 10;                                     // minimal delay is 5 ms for read operations
   
-  if      (cmd[0] == 'C'  && cmd[4] != '?') time = 1800;
-  else if (cmd[0] == 'R') time = 800;
-  else if (cmd[0] == 'L' && cmd[2] != '?') time = 300;
+  if (cmd[0] == 'C'  && cmd[4] != '?') time = 1800;
+  if (cmd[0] == 'R') time = 800;
+  if (cmd[0] == 'L' && cmd[2] != '?') time = 300;
                                  
   // if a command has been sent to Calibrate or take a Reading we wait 1400ms, 
   // so that the circuit has time to take the reading.
@@ -126,7 +126,7 @@ void I2C_call() {  			                        // function to parse and call I2C 
 
   while (code == 254) {                         // in case the command takes longer to process, 
                                                 // we keep looping here until we get a success or an error
-    Wire.requestFrom(channel, 48, 1);           // call the circuit and request 48 bytes (this is more then we need).
+    Wire.requestFrom(channel, 64, 1);           // call the circuit and request 48 bytes (this is more then we need).
     code = Wire.read();
 
     while (Wire.available()) {                  // are there bytes to receive.
@@ -151,7 +151,7 @@ void I2C_call() {  			                        // function to parse and call I2C 
         break;                         	
       case 254:                      	          // decimal 254.
         Serial.println("< Command pending");   	// means the command has not yet been finished calculating.
-        delay(200);                             // we wait for 200ms and give the circuit some time to complete the command
+        delay(100);                             // we wait for 200ms and give the circuit some time to complete the command
         break;                         	
       case 255:                      	          // decimal 255.
         Serial.println("< No data");   	        // means there is no further data to send.
