@@ -38,7 +38,7 @@
 // I2C         I2C address change                        (pg.58)
 // SLEEP       Enter low power sleep mode                (pg.59)
 
-//
+// changes by PvK
 //---------------------------------------------------------------------------------------------
 //
 // This program is free software: you can redistribute it and/or modify
