@@ -46,8 +46,8 @@ SoftwareSerial sSerial(11, 10);     // RX, TX  - Name the software serial librar
                                     // assigned to pins 10 and 11 for maximum compatibility
 int s0 = 7;                         // Tentacle uses pin 7 for multiplexer control S0
 int s1 = 6;                         // Tentacle uses pin 6 for multiplexer control S1
-int enable_1 = 5;	            // Tentacle uses pin 5 to control pin E on shield 1
-int enable_2 = 4;	            // Tentacle uses pin 4 to control pin E on shield 2
+int enable_1 = 5;	                  // Tentacle uses pin 5 to control pin E on shield 1
+int enable_2 = 4;	                  // Tentacle uses pin 4 to control pin E on shield 2
 
 char computerdata[20];              // A 20 byte character array to hold incoming data from a pc/mac/other
 char sensordata[30];                // A 30 byte character array to hold incoming data from the sensors
@@ -57,19 +57,16 @@ byte sensor_bytes_received = 0;     // We need to know how many characters bytes
 char *channel;                      // Char pointer used in string parsing
 char *cmd;                          // Char pointer used in string parsing
 
-
-
 void setup() {
-  pinMode(s0, OUTPUT);             // set the digital output pins for the serial multiplexer
+  pinMode(s0, OUTPUT);              // set the digital output pins for the serial multiplexer
   pinMode(s1, OUTPUT);
   pinMode(enable_1, OUTPUT);
   pinMode(enable_2, OUTPUT);
 
-  Serial.begin(9600);              // Set the hardware serial port to 9600
-  sSerial.begin(9600);             // Set the soft serial port to 9600 (change if all your devices use another baudrate)
-  intro();                         // display startup message
+  Serial.begin(9600);               // Set the hardware serial port to 9600
+  sSerial.begin(9600);              // Set the soft serial port to 9600 (change if all your devices use another baudrate)
+  intro();                          // display startup message
 }
-
 
 void serialEvent() {               //This interrupt will trigger when the data coming from the serial monitor(pc/mac/other) is received
   computer_bytes_received = Serial.readBytesUntil(13, computerdata, 20); //We read the data sent from the serial monitor(pc/mac/other) until we see a <CR>. We also count how many characters have been received

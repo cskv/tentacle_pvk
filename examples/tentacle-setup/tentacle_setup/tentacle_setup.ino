@@ -111,7 +111,7 @@ void setup() {
   Serial.begin(9600);                    // Set the hardware serial port to 9600
   while (!Serial) ;                      // Leonardo-type arduinos need this to be able to write to the serial port in setup()
 #if !defined (I2C_ONLY)
-  sSerial.begin(38400);                  // Set the soft serial port to 38400
+  sSerial.begin(9600);                  // Set the soft serial port to 38400
 #endif
   WIRE.begin();                 	       // enable I2C port.
 

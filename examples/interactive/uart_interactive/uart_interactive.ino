@@ -73,7 +73,7 @@ void setup() {
   pinMode(enable_2, OUTPUT);
 
   Serial.begin(9600);              // Set the hardware serial port to 9600
-  sSerial.begin(38400);             // Set the soft serial port to 9600 (change if all your devices use another baudrate)
+  sSerial.begin(9600);             // Set the soft serial port to 9600 (change if all your devices use another baudrate)
   intro();                         // display startup message
 }
 

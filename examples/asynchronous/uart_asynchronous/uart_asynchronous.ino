@@ -43,7 +43,7 @@
 SoftwareSerial sSerial(11, 10);     // RX, TX  - Name the software serial library sftSerial (this cannot be omitted)
                                     // assigned to pins 10 and 11 for maximum compatibility
                                     
-#define NUM_CIRCUITS 4              // <-- CHANGE THIS | set how many UART circuits are attached to the Tentacle
+#define NUM_CIRCUITS 2              // <-- CHANGE THIS | set how many UART circuits are attached to the Tentacle
 
 #define baud_host 9600              // set baud rate for host serial monitor(pc/mac/other)
 const unsigned int send_readings_every = 5000; // set at what intervals the readings are sent to the computer (NOTE: this is not the frequency of taking the readings!)
@@ -52,14 +52,14 @@ unsigned long next_serial_time;
 #define baud_circuits 38400         // NOTE: older circuit versions have a fixed baudrate (e.g. 38400. pick a baudrate that all your circuits understand and configure them accordingly)
 int s0 = 7;                         // Tentacle uses pin 7 for multiplexer control S0
 int s1 = 6;                         // Tentacle uses pin 6 for multiplexer control S1
-int enable_1 = 5;	            // Tentacle uses pin 5 to control pin E on shield 1
-int enable_2 = 4;	            // Tentacle uses pin 4 to control pin E on shield 2
+int enable_1 = 5;	                  // Tentacle uses pin 5 to control pin E on shield 1
+int enable_2 = 4;	                  // Tentacle uses pin 4 to control pin E on shield 2
 char sensordata[30];                          // A 30 byte character array to hold incoming data from the sensors
 byte sensor_bytes_received = 0;               // We need to know how many characters bytes have been received
 byte code = 0;                                // used to hold the I2C response code.
 byte in_char = 0;                             // used as a 1 byte buffer to store in bound bytes from the I2C Circuit.
 
-char *channel_names[] = {"DO", "ORP", "PH", "EC"};   // <-- CHANGE THIS. A list of channel names (this list should have TOTAL_CIRCUITS entries)
+char *channel_names[] = {"pH", "ORP"};   // <-- CHANGE THIS. A list of channel names (this list should have TOTAL_CIRCUITS entries)
                                                      // only used to designate the readings in serial communications
                                                      // position in array defines the serial channel. e.g. channel_names[0] is channel 0 on the shield; "PH" in this case.
 String readings[NUM_CIRCUITS];                // an array of strings to hold the readings of each channel
@@ -67,9 +67,9 @@ int channel = 0;                              // INT pointer to hold the current
 
 const unsigned int reading_delay = 100;       // delay between each reading.
                                               // low values give fast reading updates, <1 sec per circuit.
-                                              // high values give your Ardino more time for other stuff
+                                              // high values give your Arduino more time for other stuff
 unsigned long next_reading_time;              // holds the time when the next reading should be ready from the circuit
-boolean request_pending = false;              // wether or not we're waiting for a reading
+boolean request_pending = false;              // whether or not we're waiting for a reading
 
 const unsigned int blink_frequency = 250;     // the frequency of the led blinking, in milliseconds
 unsigned long next_blink_time;                // holds the next time the led should change state
@@ -92,8 +92,6 @@ void setup() {
   Serial.println("-----");
 }
 
-
-
 void loop() {
   do_sensor_readings();
   do_serial();
@@ -103,8 +101,6 @@ void loop() {
   blink_led();
 }
 
-
-
 // blinks a led on pin 13 asynchronously 
 void blink_led() {
   if (millis() >= next_blink_time) {                  // is it time for the blink already?
@@ -113,8 +109,6 @@ void blink_led() {
     next_blink_time = millis() + blink_frequency;     // calculate the next time a blink is due
   }
 }
-
-
 
 // do serial communication in a "asynchronous" way
 void do_serial() {
@@ -130,14 +124,11 @@ void do_serial() {
   }
 }
 
-
 // take sensor readings in a "asynchronous" way
 void do_sensor_readings() {
   
   if (request_pending) {                          // is a request pending?
-
     while (sSerial.available()) {                 // while there is data available from the circuit
-      
       char c = sSerial.read();                    // read the next available byte from the circuit
 
       if (c=='\r') {                              // in case it's a <CR> character, we reached the end of a message
